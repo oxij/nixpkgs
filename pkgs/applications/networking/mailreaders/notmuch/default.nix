@@ -1,4 +1,4 @@
-{ fetchurl, stdenv, fixDarwinDylibNames, gdb
+{ fetchurl, stdenv, fixDarwinDylibNames
 , pkgconfig, gnupg
 , xapian, gmime, talloc, zlib
 , doxygen, perl
@@ -6,7 +6,7 @@
 , bash-completion
 , emacs
 , ruby
-, which, dtach, openssl, bash
+, which, dtach, openssl, bash, gdb, man
 }:
 
 stdenv.mkDerivation rec {
@@ -34,17 +34,9 @@ stdenv.mkDerivation rec {
     which dtach openssl bash  # test dependencies
     ]
     ++ stdenv.lib.optional stdenv.isDarwin fixDarwinDylibNames
-    ++ stdenv.lib.optional (!stdenv.isDarwin) gdb;
+    ++ stdenv.lib.optionals (!stdenv.isDarwin) [ gdb man ]; # test
 
-  doCheck = !stdenv.isDarwin;
-  checkTarget = "test";
-
-  patchPhase = ''
-    # XXX: disabling few tests since i have no idea how to make them pass for now
-    rm -f test/T010-help-test.sh \
-          test/T350-crypto.sh \
-          test/T355-smime.sh
-
+  postPatch = ''
     find test -type f -exec \
       sed -i \
         -e "1s|#!/usr/bin/env bash|#!${bash}/bin/bash|" \
@@ -64,6 +56,8 @@ stdenv.mkDerivation rec {
         --replace \"gpg\" \"${gnupg}/bin/gpg\"
     done
   '';
+
+  makeFlags = "V=1";
 
   preFixup = stdenv.lib.optionalString stdenv.isDarwin ''
     set -e
@@ -92,9 +86,13 @@ stdenv.mkDerivation rec {
     install_name_tool -change "$badname" "$goodname" "$prg"
   '';
 
+  doCheck = !stdenv.isDarwin;
+  checkTarget = "test V=1";
+
   postInstall = ''
     make install-man
   '';
+
   dontGzipMan = true; # already compressed
 
   meta = with stdenv.lib; {
