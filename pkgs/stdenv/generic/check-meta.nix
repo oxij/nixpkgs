@@ -2,10 +2,10 @@
 # descriptive error when the check fails; return `derivationArg` otherwise.
 # Note: no dependencies are checked in this step.
 
-{ lib, config, system, meta, derivationArg, mkDerivationArg }:
+{ lib, config, system, meta, derivationArg }:
 
 let
-  attrs = mkDerivationArg; # TODO: probably get rid of passing this one
+  attrs = derivationArg // { inherit meta; };
 
   # See discussion at https://github.com/NixOS/nixpkgs/pull/25304#issuecomment-298385426
   # for why this defaults to false, but I (@copumpkin) want to default it to true soon.

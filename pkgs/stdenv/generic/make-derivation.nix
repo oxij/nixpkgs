@@ -167,7 +167,6 @@ rec {
         (derivation (import ./check-meta.nix
           {
             inherit lib config meta derivationArg;
-            mkDerivationArg = attrs;
             # Nix itself uses the `system` field of a derivation to decide where
             # to build it. This is a bit confusing for cross compilation.
             inherit (stdenv) system;
