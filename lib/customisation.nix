@@ -36,7 +36,7 @@ rec {
   overrideDerivation = drv: f:
     let
       newDrv = derivation (drv.drvAttrs // (f drv));
-    in addPassthru newDrv (
+    in extendDerivation (
       { meta = drv.meta or {};
         passthru = if drv ? passthru then drv.passthru else {};
       }
@@ -48,7 +48,7 @@ rec {
          crossDrv = overrideDerivation drv.crossDrv f;
          nativeDrv = overrideDerivation drv.nativeDrv f;
        }
-       else { }));
+       else { })) (k: v: v) newDrv;
 
 
   /* `makeOverridable` takes a function from attribute set to attribute set and
@@ -131,8 +131,9 @@ rec {
 
 
   /* Add attributes to each output of a derivation without changing
-     the derivation itself. */
-  addPassthru = drv: passthru:
+     the derivation itself and then change all outptus with a given
+     function. */
+  extendDerivation = passthru: f: drv:
     let
       outputs = drv.outputs or [ "out" ];
 
@@ -141,9 +142,9 @@ rec {
 
       outputToAttrListElement = outputName:
         { name = outputName;
-          value = commonAttrs // {
+          value = f outputName (commonAttrs // {
             inherit (drv.${outputName}) outPath drvPath type outputName;
-          };
+          });
         };
 
       outputsList = map outputToAttrListElement outputs;

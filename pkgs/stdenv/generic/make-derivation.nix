@@ -163,14 +163,7 @@ rec {
 
     in
 
-      lib.addPassthru
-        (derivation (import ./check-meta.nix
-          {
-            inherit lib config meta derivationArg;
-            # Nix itself uses the `system` field of a derivation to decide where
-            # to build it. This is a bit confusing for cross compilation.
-            inherit (stdenv) system;
-          }))
+      lib.extendDerivation
         ( {
             overrideAttrs = f: mkDerivation (attrs // (f attrs));
             inherit meta passthru;
@@ -178,5 +171,14 @@ rec {
           # Pass through extra attributes that are not inputs, but
           # should be made available to Nix expressions using the
           # derivation (e.g., in assertions).
-          passthru);
+          passthru)
+        (k: v: v)
+        (derivation (import ./check-meta.nix
+          {
+            inherit lib config meta derivationArg;
+            # Nix itself uses the `system` field of a derivation to decide where
+            # to build it. This is a bit confusing for cross compilation.
+            inherit (stdenv) system;
+          }));
+
 }
