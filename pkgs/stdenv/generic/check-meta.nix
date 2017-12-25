@@ -1,8 +1,11 @@
+# TODO(@oxij): split this into check-meta and check-output.
+# There's no need to check meta each time for every output in make-derivation.nix.
+
 # Extend a derivation with checks for brokenness, license, etc.  Throw a
 # descriptive error when the check fails; return `derivationArg` otherwise.
 # Note: no dependencies are checked in this step.
 
-{ lib, config, system, meta, derivationArg }:
+{ lib, config, system, meta }: derivationArg:
 
 let
   attrs = derivationArg // { inherit meta; };

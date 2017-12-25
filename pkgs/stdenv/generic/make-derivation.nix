@@ -172,13 +172,13 @@ rec {
           # should be made available to Nix expressions using the
           # derivation (e.g., in assertions).
           passthru)
-        (k: v: v)
-        (derivation (import ./check-meta.nix
+        (k: import ./check-meta.nix
           {
-            inherit lib config meta derivationArg;
+            inherit lib config meta;
             # Nix itself uses the `system` field of a derivation to decide where
             # to build it. This is a bit confusing for cross compilation.
             inherit (stdenv) system;
-          }));
+          })
+        (derivation derivationArg);
 
 }
