@@ -574,6 +574,9 @@ in
         EOF
         chmod +x $out/bin/openssl-wrap
       ''}
+      find $out/bin $out/lib -type f | while read BIN; do
+        copy_libs $BIN
+      done
     '';
 
     boot.initrd.extraUtilsCommandsTest = ''
