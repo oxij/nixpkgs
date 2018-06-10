@@ -243,6 +243,11 @@ let
 
     isExecutable = true;
 
+    postInstall = ''
+      echo checking syntax
+      ${pkgs.bash}/bin/sh -n $target
+    '';
+
     inherit udevRules extraUtils modulesClosure;
 
     inherit (config.boot) resumeDevice;
