@@ -9,13 +9,15 @@ stdenv.mkDerivation rec {
     sha256 = "0xhj8b2pwp4vhl9y16v3dpxpsakkflfamr191mprzsspg4xdyc0i";
   };
 
-  patchPhase = ''
+  postPatch = ''
     substituteInPlace "xmlto.in" \
       --replace "/bin/bash" "${bash}/bin/bash"
     substituteInPlace "xmlto.in" \
       --replace "/usr/bin/locale" "$(type -P locale)"
     substituteInPlace "xmlto.in" \
       --replace "mktemp" "$(type -P mktemp)"
+
+    patchShebangs xmlif/test/run-test
   '';
 
   # `libxml2' provides `xmllint', needed at build-time and run-time.
