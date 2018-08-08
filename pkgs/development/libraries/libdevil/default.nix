@@ -1,5 +1,5 @@
 { stdenv, fetchurl, libjpeg, libpng, libmng, lcms1, libtiff, openexr, libGL
-, libX11, pkgconfig, OpenGL
+, libX11, pkgconfig, OpenGL, bash
 }:
 
 stdenv.mkDerivation rec {
@@ -41,6 +41,13 @@ stdenv.mkDerivation rec {
     ];
 
   enableParallelBuilding = true;
+
+  postPatch = ''
+    for a in test/Makefile.in test/format_test/format_checks.sh.in ; do
+      substituteInPlace $a \
+        --replace /bin/bash ${bash}/bin/bash
+    done
+  '';
 
   meta = with stdenv.lib; {
     homepage = http://openil.sourceforge.net/;
