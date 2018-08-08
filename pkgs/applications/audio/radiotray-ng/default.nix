@@ -58,9 +58,10 @@ stdenv.mkDerivation rec {
     libxdg_basedir
     lsb-release
     wxGTK
-  ] ++ stdenv.lib.optional doCheck gmock
-    ++ gstInputs
+  ] ++ gstInputs
     ++ pythonInputs;
+
+  checkInputs = [ gmock ];
 
   prePatch = ''
     for x in debian/CMakeLists.txt include/radiotray-ng/common.hpp data/*.desktop; do
@@ -74,13 +75,13 @@ stdenv.mkDerivation rec {
       --replace radiotray-ng-notification radiotray-ng-on
   '';
 
-  cmakeFlags = stdenv.lib.optional doCheck "-DBUILD_TESTS=ON";
+  cmakeFlags = [
+    "-DBUILD_TESTS=${if doCheck then "ON" else "OFF"}"
+  ];
 
   enableParallelBuilding = true;
 
- # XXX: as of 0.2.2, tries to download gmock instead of checking for provided
-  doCheck = false;
-
+  doCheck = stdenv.hostPlatform == stdenv.buildPlatform;
   checkPhase = "ctest";
 
   preFixup = ''
