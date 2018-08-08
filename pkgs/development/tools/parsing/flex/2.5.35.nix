@@ -8,6 +8,10 @@ stdenv.mkDerivation rec {
     sha256 = "0wh06nix8bd4w1aq4k2fbbkdq5i30a9lxz3xczf3ff28yy0kfwzm";
   };
 
+  postPatch = ''
+    patchShebangs tests
+  '';
+
   nativeBuildInputs = [ flex bison texinfo help2man autoreconfHook ];
 
   propagatedBuildInputs = [ m4 ];
