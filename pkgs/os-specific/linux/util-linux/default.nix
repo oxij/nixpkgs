@@ -26,6 +26,8 @@ in stdenv.mkDerivation rec {
       --replace "/bin/login" "${shadow}/bin/login"
     substituteInPlace sys-utils/eject.c \
       --replace "/bin/umount" "$out/bin/umount"
+
+    patchShebangs tests/run.sh
   '';
 
   # !!! It would be better to obtain the path to the mount helpers
@@ -53,6 +55,8 @@ in stdenv.mkDerivation rec {
   buildInputs =
     [ zlib pam ]
     ++ lib.filter (p: p != null) [ ncurses systemd perl ];
+
+  doCheck = false; # "For development purpose only. Don't execute on production system!"
 
   postInstall = ''
     rm "$bin/bin/su" # su should be supplied by the su package (shadow)
