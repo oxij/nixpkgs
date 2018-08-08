@@ -13,8 +13,7 @@ stdenv.mkDerivation rec {
     ++ stdenv.lib.optional (readline != null) readline
     ++ stdenv.lib.optional (gettext != null) gettext
     ++ stdenv.lib.optional (lvm2 != null) lvm2
-    ++ stdenv.lib.optional (hurd != null) hurd
-    ++ stdenv.lib.optional doCheck check;
+    ++ stdenv.lib.optional (hurd != null) hurd;
 
   configureFlags =
        (if (readline != null)
@@ -24,11 +23,12 @@ stdenv.mkDerivation rec {
     ++ stdenv.lib.optional enableStatic "--enable-static";
 
   doCheck = true;
+  checkInputs = [ check ];
 
-  preCheck =
-    stdenv.lib.optionalString doCheck
-      # The `t0400-loop-clobber-infloop.sh' test wants `mkswap'.
-      "export PATH=\"${utillinux}/sbin:$PATH\"";
+  # The `t0400-loop-clobber-infloop.sh' test wants `mkswap'.
+  preCheck = ''
+    export PATH=${utillinux}/sbin:$PATH
+  '';
 
   meta = {
     description = "Create, destroy, resize, check, and copy partitions";
