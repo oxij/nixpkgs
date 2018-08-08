@@ -12,7 +12,8 @@ stdenv.mkDerivation rec {
 
   hardeningDisable = [ "format" ];
 
-  buildInputs = [ curl emacs ] ++ (stdenv.lib.optionals doCheck [ check bc ]);
+  buildInputs = [ curl emacs ];
+  checkInputs = [ check bc ];
 
   postInstall = ''
     ${emacs}/bin/emacs -Q -batch -f batch-byte-compile $out/share/emacs/site-lisp/*.el #*/
