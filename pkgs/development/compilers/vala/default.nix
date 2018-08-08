@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchurl, pkgconfig, flex, bison, libxslt, autoconf, graphviz
+{ stdenv, lib, fetchurl, pkgconfig, flex, bison, libxslt, autoconf, automake, graphviz
 , glib, libiconv, libintl, libtool, expat
 }:
 
@@ -7,7 +7,8 @@ let
   let
     atLeast = lib.versionAtLeast "${major}.${minor}";
   in stdenv.mkDerivation rec {
-    name = "vala-${major}.${minor}";
+    name = "vala-${version}";
+    version = "${major}.${minor}";
 
     src = fetchurl {
       url = "mirror://gnome/sources/vala/${major}/${name}.tar.xz";
@@ -25,6 +26,19 @@ let
       glib libiconv libintl
     ] ++ lib.optional (atLeast "0.38") graphviz
       ++ extraBuildInputs;
+
+    postPatch = ''
+      patchShebangs tests
+    '';
+
+    # ''
+    #   # disable dbus tests
+    #   sed -i -e 's@dbus/[^ ]*\.\(test\|vala\)@@g' tests/Makefile.am
+    # '';
+    #
+    # checkInputs = [ automake_1_15 ];
+
+    doCheck = false; # requires dbus daemon
 
     meta = with stdenv.lib; {
       description = "Compiler for GObject type system";
