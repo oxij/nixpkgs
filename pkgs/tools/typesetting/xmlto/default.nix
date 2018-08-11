@@ -10,14 +10,14 @@ stdenv.mkDerivation rec {
   };
 
   postPatch = ''
+    patchShebangs xmlif/test/run-test
+
     substituteInPlace "xmlto.in" \
       --replace "/bin/bash" "${bash}/bin/bash"
     substituteInPlace "xmlto.in" \
       --replace "/usr/bin/locale" "$(type -P locale)"
     substituteInPlace "xmlto.in" \
       --replace "mktemp" "$(type -P mktemp)"
-
-    patchShebangs xmlif/test/run-test
   '';
 
   # `libxml2' provides `xmllint', needed at build-time and run-time.
