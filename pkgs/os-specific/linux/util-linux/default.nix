@@ -22,12 +22,12 @@ in stdenv.mkDerivation rec {
   outputs = [ "bin" "dev" "out" "man" ];
 
   postPatch = ''
+    patchShebangs tests/run.sh
+
     substituteInPlace include/pathnames.h \
       --replace "/bin/login" "${shadow}/bin/login"
     substituteInPlace sys-utils/eject.c \
       --replace "/bin/umount" "$out/bin/umount"
-
-    patchShebangs tests/run.sh
   '';
 
   # !!! It would be better to obtain the path to the mount helpers
