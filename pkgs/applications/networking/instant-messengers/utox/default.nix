@@ -25,14 +25,13 @@ stdenv.mkDerivation rec {
     cmake pkgconfig
   ];
 
-  checkInputs = [ check ];
-
   cmakeFlags = [
     "-DENABLE_AUTOUPDATE=OFF"
     "-DENABLE_TESTS=${if doCheck then "ON" else "OFF"}"
   ];
 
   doCheck = stdenv.hostPlatform == stdenv.buildPlatform;
+  checkInputs = [ check ];
   checkPhase = ''
     runHook preCheck
     ctest -VV
