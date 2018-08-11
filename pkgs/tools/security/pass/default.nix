@@ -87,7 +87,7 @@ let
         --prefix PATH : "$out/bin:${wrapperPath}"
     '';
 
-    # Turn "test" into "installcheck", since we want to test our pass,
+    # Turn "check" into "installcheck", since we want to test our pass,
     # not the one before the fixup.
     postPatch = ''
       patchShebangs tests
