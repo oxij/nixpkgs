@@ -92,7 +92,6 @@ let
              else lib.makeOverridable (import ../../build-support/cc-wrapper) {
           name = "${name}-gcc-wrapper";
           nativeTools = false;
-          propagateDoc = false;
           nativeLibc = false;
           buildPackages = lib.optionalAttrs (prevStage ? stdenv) {
             inherit (prevStage) stdenv;
@@ -162,7 +161,6 @@ in
       binutils = import ../../build-support/bintools-wrapper {
         name = "bootstrap-stage0-binutils-wrapper";
         nativeTools = false;
-        propagateDoc = true;
         nativeLibc = false;
         buildPackages = { };
         libc = getLibc self;
