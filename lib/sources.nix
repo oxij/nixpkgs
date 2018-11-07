@@ -98,6 +98,61 @@ rec {
            else throw ("Not a .git directory: " + path);
     in lib.flip readCommitFromFile "HEAD";
 
+  # Makeup a package name for a given repository and revision.
+  #
+  # This is used by fetch(zip|git|hg|svn|etc) to generate discoverable
+  # /nix/store paths.
+  repoToName = type: repo_: rev_:
+    let
+      repo = toString repo_; # url can be a path
+      rev = toString rev_;   # rev can be a number
+
+      path = lib.reverseList (lib.splitString "/" (lib.removeSuffix "/" repo));
+
+      fst = lib.head path;
+      snd = lib.head (lib.tail path);
+      trd = lib.head (lib.tail (lib.tail path));
+
+      gitBase = builtins.match "(.*).git" fst;
+
+      svnBase =
+        # ../repo/trunk -> repo
+        if fst == "trunk" then snd
+        # ../repo/branches/branch -> repo
+        else if snd == "branches" then trd
+        # ../repo/tags/tag -> repo
+        else if snd == "tags" then trd
+        # ../repo (no trunk) -> repo
+        else fst;
+
+      base' =
+        if type == "git" && !isNull gitBase then builtins.head gitBase
+        else if type == "svn" then svnBase
+        else fst;
+
+      base = baseNameOf (lib.last (lib.splitString ":" base'));
+
+      svnRev =
+        # ../repo/branches/branch -> branch
+        # ../repo/tags/tag -> tag
+        if snd == "branches" || snd == "tags"
+        then "${fst}-${rev}"
+        else rev;
+
+      baseRev = lib.removePrefix base ( # revisions often contain project names
+        if type == "svn" then svnRev
+        else lib.last (lib.splitString "/" rev)
+      );
+
+      hashRev = builtins.match "[a-f0-9]+" baseRev;
+      versionRev = builtins.match "[-_. ]?(v|version|release)?[-_. ]?([0-9.]+.*)" baseRev;
+
+      shortRev =
+        if !isNull hashRev then builtins.substring 0 7 baseRev
+        else if !isNull versionRev then builtins.elemAt versionRev 1
+        else baseRev;
+    in "${base}-${shortRev}-${type}-source";
+
   pathHasContext = builtins.hasContext or (lib.hasPrefix builtins.storeDir);
 
   canCleanSource = src: src ? _isLibCleanSourceWith || !(pathHasContext (toString src));

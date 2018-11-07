@@ -1,15 +1,20 @@
-{stdenvNoCC, mercurial}: {name ? null, url, rev ? null, md5 ? null, sha256 ? null, fetchSubrepos ? false}:
+{ lib, stdenvNoCC, mercurial }:
+{ url, rev ? "tip", md5 ? null, sha256 ? null
+, fetchSubrepos ? false
+, name ? lib.repoToName "hg" url rev
+}:
 
 if md5 != null then
   throw "fetchhg does not support md5 anymore, please use sha256"
 else
 # TODO: statically check if mercurial as the https support if the url starts woth https.
 stdenvNoCC.mkDerivation {
-  name = "hg-archive" + (if name != null then "-${name}" else "");
+  inherit name;
+
   builder = ./builder.sh;
   nativeBuildInputs = [mercurial];
 
-  impureEnvVars = stdenvNoCC.lib.fetchers.proxyImpureEnvVars;
+  impureEnvVars = lib.fetchers.proxyImpureEnvVars;
 
   subrepoClause = if fetchSubrepos then "S" else "";
 

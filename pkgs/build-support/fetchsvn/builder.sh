@@ -1,6 +1,6 @@
 source $stdenv/setup
 
-header "exporting $url (r$rev) into $out"
+header "exporting $url ($rev) into $out"
 
 if test "$sshSupport"; then
     export SVN_SSH="$openssh/bin/ssh"

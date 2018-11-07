@@ -236,7 +236,7 @@ with pkgs;
   fetchCrate = callPackage ../build-support/rust/fetchcrate.nix { };
 
   fetchFromGitHub = {
-    owner, repo, rev, name ? "source",
+    owner, repo, rev, name ? lib.repoToName "github" repo rev,
     fetchSubmodules ? false, private ? false,
     githubBase ? "github.com", varPrefix ? null,
     ... # For hash agility
@@ -269,7 +269,7 @@ with pkgs;
   in fetcher fetcherArgs // { meta.homepage = baseUrl; inherit rev; };
 
   fetchFromBitbucket = {
-    owner, repo, rev, name ? "source",
+    owner, repo, rev, name ? lib.repoToName "bitbucket" repo rev,
     ... # For hash agility
   }@args: fetchzip ({
     inherit name;
@@ -280,7 +280,7 @@ with pkgs;
 
   # cgit example, snapshot support is optional in cgit
   fetchFromSavannah = {
-    repo, rev, name ? "source",
+    repo, rev, name ? lib.repoToName "savannah" repo rev,
     ... # For hash agility
   }@args: fetchzip ({
     inherit name;
@@ -290,7 +290,8 @@ with pkgs;
 
   # gitlab example
   fetchFromGitLab = {
-    owner, repo, rev, domain ? "gitlab.com", name ? "source", group ? null,
+    owner, repo, rev, name ? lib.repoToName "gitlab" repo rev,
+    group ? null, domain ? "gitlab.com",
     ... # For hash agility
   }@args: fetchzip ({
     inherit name;
@@ -300,7 +301,7 @@ with pkgs;
 
   # gitweb example, snapshot support is optional in gitweb
   fetchFromRepoOrCz = {
-    repo, rev, name ? "source",
+    repo, rev, name ? lib.repoToName "repoorcz" repo rev,
     ... # For hash agility
   }@args: fetchzip ({
     inherit name;

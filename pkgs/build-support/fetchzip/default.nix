@@ -11,7 +11,7 @@
   stripRoot ? true
 , url
 , extraPostFetch ? ""
-, name ? "source"
+, name ? lib.repoToName "unpack" url ""
 , ... } @ args:
 
 (fetchurl ({
