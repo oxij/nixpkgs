@@ -1,0 +1,54 @@
+#+TITLE: SLNOS Project Public Mirror README
+
+#+BEGIN_EXPORT html
+<p align="center"><img src="doc/slnos.svg" width="50%"></p>
+#+END_EXPORT
+
+* What?
+This repository is a mirror containing public SLNOS patchsets to [[https://github.com/NixOS/nixpkgs][Nixpkgs/NixOS]].
+* Why?
+Because we want Nixpkgs/NixOS to have those patches applied but Nixpkgs/NixOS' maintainers disagree.
+* How to use
+Assuming
+
+#+BEGIN_SRC bash
+git remote add upstream https://github.com/NixOS/nixpkgs
+git remote add slnos https://github.com/SLNOS/nixpkgs
+git fetch upstream
+git fetch slnos
+#+END_SRC
+
+- The simplest way:
+
+  #+BEGIN_SRC bash
+  git checkout slnos/<patchset-you-want,-e.g.-it-aint-broken>/<upstream-branch-you-want,-e.g.-master>/<date>
+  #+END_SRC
+
+  and use the resulting tree as your =<nixpkgs>=.
+
+- A bit more complex way:
+
+  #+BEGIN_SRC bash
+  git checkout upstream/<upstream-branch-you-want>
+  git merge slnos/<patchset-you-want>/<upstream-branch-you-want>/<date>
+  #+END_SRC
+
+  and use the resulting tree as your =<nixpkgs>=.
+
+# TODO Publish SLNOS tooling first.
+# - The most flexible way:
+# 
+#   #+BEGIN_SRC bash
+#   ./bin/slnosify --worktree <directory-name,-e.g.-slnos> --upstream upstream/master --patchset <patchset-you-want>
+#   #+END_SRC
+# 
+#   and use =<directory-name>= as your =<nixpkgs>=.
+* Patchsets
+- =it-aint-broken= :: contains good (not broken) non-mass-rebuild things previously removed from Nixpkgs/NixOS without adequate replacements. [[https://github.com/SLNOS/nixpkgs/issues/1][The corresponding tracking issue.]] This patchset goes first so that the upstream Hydra cache could be used for things it does not touch.
+
+# TODO Publish these too.
+# 
+# - =qnd-fixes= :: quick and dirty fixes to Nixpkgs, these usually fix problems that are found by not using the Hydra cache, can cause mass-rebuilds
+# - =it-aint-broken-mr= :: like =it-aint-broken=, but can contain mass-rebuilds
+# - =notchb= :: "Nixpkgs/NixOS That Could Have Been", contains useful things that were never accepted to Nixpkgs/NixOS but they could have been accepted in principle
+# - =notwsl= :: "Nixpkgs/NixOS That Would Suck Less", replaces Nixpkgs/NixOS defaults with things that suck less, these probably would never be accepted upstream
