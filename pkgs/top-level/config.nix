@@ -129,8 +129,6 @@ let
     };
 
     cudaSupport = mkMassRebuild {
-      type = types.bool;
-      default = false;
       feature = "build packages with CUDA support by default";
     };
 
@@ -163,8 +161,6 @@ let
     };
 
     rocmSupport = mkMassRebuild {
-      type = types.bool;
-      default = false;
       feature = "build packages with ROCm support by default";
     };
 
