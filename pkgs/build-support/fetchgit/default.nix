@@ -1,33 +1,30 @@
-{lib, stdenvNoCC, git, git-lfs, cacert}: let
+{lib, stdenvNoCC, git, git-lfs, cacert}:
+
+let
   urlToName = url: rev: let
-    inherit (lib) removeSuffix splitString last;
-    base = last (splitString ":" (baseNameOf (removeSuffix "/" url)));
-
-    matched = builtins.match "(.*)\\.git" base;
-
-    short = builtins.substring 0 7 rev;
-
-    appendShort = lib.optionalString ((builtins.match "[a-f0-9]*" rev) != null) "-${short}";
-  in "${if matched == null then base else builtins.head matched}${appendShort}";
+    shortRev = lib.sources.shortRev rev;
+    appendShort = lib.optionalString ((builtins.match "[a-f0-9]*" rev) != null) "-${shortRev}";
+  in "${lib.sources.urlToName url}${appendShort}";
 in
+
 lib.makeOverridable (lib.fetchers.withNormalizedHash { } (
 # NOTE Please document parameter additions or changes in
-#   doc/build-helpers/fetchers.chapter.md
+#   ../../../doc/build-helpers/fetchers.chapter.md
 { url
 , tag ? null
 , rev ? null
+, name ? urlToName url (lib.revOrTag rev tag)
 , leaveDotGit ? deepClone
 , outputHash ? lib.fakeHash, outputHashAlgo ? null
 , fetchSubmodules ? true, deepClone ? false
 , branchName ? null
 , sparseCheckout ? []
 , nonConeMode ? false
-, name ? null
-, nativeBuildInputs ? []
 , # Shell code executed after the file has been fetched
   # successfully. This can do things like check or transform the file.
   postFetch ? ""
 , preferLocalBuild ? true
+, nativeBuildInputs ? []
 , fetchLFS ? false
 , # Shell code to build a netrc file for BASIC auth
   netrcPhase ? null
@@ -85,7 +82,7 @@ if builtins.isString sparseCheckout then
   throw "Please provide directories/patterns for sparse checkout as a list of strings. Passing a (multi-line) string is not supported any more."
 else
 stdenvNoCC.mkDerivation {
-  name = if name != null then name else urlToName url revWithTag;
+  inherit name;
 
   builder = ./builder.sh;
   fetcher = ./nix-prefetch-git;

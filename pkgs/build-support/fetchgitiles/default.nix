@@ -1,11 +1,11 @@
-{ fetchzip, lib }:
+{ fetchzip, repoRevToNameMaybe, lib }:
 
 lib.makeOverridable (
   {
     url,
     rev ? null,
     tag ? null,
-    name ? "source",
+    name ? repoRevToNameMaybe url (lib.revOrTag rev tag) "gitiles",
     ...
   }@args:
 
